@@ -1,5 +1,5 @@
 import { RouterSharp } from '@mui/icons-material';
-import React from 'react'
+import React, { useContext } from 'react'
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import LandingPage from '../components/LandingPage';
 import Auth from '../components/Auth';
@@ -14,27 +14,31 @@ import EmployerProfile from '../components/employer/EmployerProfile';
 import EmployerJobs from '../components/employer/EmployerJobs';
 import EmployerApplications from '../components/employer/EmployerApplications';
 import EmployerConversations from '../components/employer/EmployerConversations';
+import { userContext } from '../components/context/userContext';
 
 function Nav () {
+  const [state,dispatch] = useContext(userContext);
   const CandidateProtectedRoutes = () =>{
     if(
-      true
-    ){
+        state.userAuth &&
+        state.userType==="candidate"
+      ){
       return <Outlet/>;
     }
 
     else{
-      return <Navigate to="/auth"/>;
+      return <Navigate to="/candidate/auth"/>;
     }
   }; 
     
   const EmployerProtectedRoutes = ()=>{
     if(
-      true
+       state.userAuth &&
+       state.userType==="employer"
     ){
       return <Outlet/>;
     } else{
-      return <Navigate to="/auth"/>;
+      return <Navigate to="/employer/auth"/>;
     }
   }
   return(
