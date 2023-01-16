@@ -1,4 +1,3 @@
-import './App.css';
 import Nav from './Nav';
 import { UserProvider } from './components/context/userContext';
 function App() {
