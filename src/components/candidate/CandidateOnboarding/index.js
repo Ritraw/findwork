@@ -12,6 +12,7 @@ import { primaryRole , skills} from '../../../constant';
 import SearchDropdown from '../../common/SearchDropdown';
 import { doc, setDoc } from 'firebase/firestore';
 import { async } from '@firebase/util';
+import toastMessage from '../../../util/toastMessage';
 
 function CandidateOnboarding() {
   const [state , dispatch] = useContext(userContext);
@@ -59,9 +60,19 @@ function CandidateOnboarding() {
     // setDoc(docref, data)
     //doc(db ref, collection name, doc id)
     const userId = state.userInfo.uid;
-    await setDoc(doc(db,"userInfo", userId ),{
-      ...userData,
-    })
+    try{
+      await setDoc(doc(db,"userInfo", userId ),{
+        ...userData,
+        userType: "candidate",
+      })
+      toastMessage({message: 'Profile created Successfully', type: 'success'})
+      navigate("/candidate/profile")
+    }
+    catch(error){
+      console.log(error)
+      toastMessage({message: 'err.message',type: 'error'})
+    }
+
   }
   return (
     <form
@@ -86,6 +97,7 @@ function CandidateOnboarding() {
           <TextField size='small' fullWidth
              value={userData.email}
              required
+             disabled
              onChange={(e)=> setUserData({...userData, email: e.target.value})}
           />
         </Grid>

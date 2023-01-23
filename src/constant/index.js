@@ -75,3 +75,80 @@ export const skills = [
         value: "Express"
     },
 ]
+
+export const industryType = [
+    {
+      label: "IT",
+      value: "IT",
+    },
+    {
+      label: "Finance",
+      value: "Finance",
+    },
+    {
+      label: "Healthcare",
+      value: "Healthcare",
+    },
+    {
+      label: "Education",
+      value: "Education",
+    },
+    {
+      label: "Retail",
+      value: "Retail",
+  
+    },
+    {
+      label: "Manufacturing",
+      value: "Manufacturing",
+    },
+    {
+      label: "Agriculture",
+      value: "Agriculture",
+  
+    },
+    {
+      label: "Construction",
+      value: "Construction",
+  
+    },
+    {
+      label: "Transportation",
+      value: "Transportation",
+  
+    },
+  
+    {
+      label: "Telecommunication",
+      value: "Telecommunication",
+    }
+  ]
+  
+  export const companySize = [
+    {
+      label: "1-10",
+      value: "1-10",
+    },
+    {
+      label: "11-50",
+      value: "11-50",
+  
+    },
+    {
+      label: "51-100",
+      value: "51-100",
+    },
+    {
+      label: "101-500",
+      value: "101-500",
+    },
+    {
+      label: "501-1000",
+      value: "501-1000",
+    },
+    {
+      label: "1000+",
+      value: "1000+",
+    }
+  ]
+  
