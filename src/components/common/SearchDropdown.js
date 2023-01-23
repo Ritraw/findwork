@@ -10,12 +10,14 @@ function SearchDropdown(
     {dropdowndata,
     onChange,
     values,
-    handleDelete
+    handleDelete,
+    disabled
 }
 ) {
   return (
     <>
       <Autocomplete
+      disabled={disabled}
       fullWidth
         disablePortal
         id="combo-box-demo"

@@ -23,6 +23,7 @@ function Dropdown({
       <FormControl fullWidth>
        
         <Select
+        disabled={disabled }
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={value}

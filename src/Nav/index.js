@@ -15,6 +15,8 @@ import EmployerJobs from '../components/employer/EmployerJobs';
 import EmployerApplications from '../components/employer/EmployerApplications';
 import EmployerConversations from '../components/employer/EmployerConversations';
 import { userContext } from '../components/context/userContext';
+import EmployerHoc  from '../components/Hoc/EmployerHoc';
+import CandidateHoc from '../components/Hoc/CandidateHoc';
 
 function Nav () {
   const [state,dispatch] = useContext(userContext);
@@ -23,7 +25,7 @@ function Nav () {
         state.userAuth &&
         state.userType==="candidate"
       ){
-      return <Outlet/>;
+      return <CandidateHoc><Outlet/></CandidateHoc>;
     }
 
     else{
@@ -36,7 +38,7 @@ function Nav () {
        state.userAuth &&
        state.userType==="employer"
     ){
-      return <Outlet/>;
+      return <EmployerHoc><Outlet/></EmployerHoc>;
     } else{
       return <Navigate to="/employer/auth"/>;
     }

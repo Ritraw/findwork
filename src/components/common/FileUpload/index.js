@@ -7,6 +7,7 @@ function FileUpload({
     type='file',
     onUpload,
     value,
+    disabled,
     required = false
 }) {
     const [progress, setProgress] = useState(0)
@@ -46,46 +47,51 @@ uploadTask.on('state_changed',
 );
     }
     
-  return (
-    <>
-    {
-        progress > 0 ? (<div>{progress}%</div>):
-        (
-        <div>
-        <TextField
-        required
-        value={value}
-        sx={{
-            display:"none"
-        }}
-        />
-
-        <TextField
-            size='small'
-            inputProps={{
-                accept: type === "image"? "image/*": "application/pdf",
-            }}
-            fullwidth
-            type={'file'}
-            onChange={onChange}
-        />
-        <div>
-            {value&&
-                (type === "iamge"?(
-                    <img src={value} alt="resume"/>
-                ):(
-                    <a href={value} target="_blank" rel="noreferrer">
-                        View Resume
-                    </a>
-                ))
-            }
-        </div>
-        
-        </div>)
-    }
-    </>
-    
-  )
-}
+    return disabled ? (
+      <div style={{ width: "200px", margin: "10px auto" }}>
+        {type === "image" ? (
+          <img width="100%" src={value} alt="resume" />
+        ) : (
+          <a href={value} target="_blank" rel="noreferrer">
+            view Resume
+          </a>
+        )}
+      </div>
+    ) : (
+      <>
+        {progress > 0 ? (
+          <div>{progress}%</div>
+        ) : (
+          <div className="input-cointainer">
+            <TextField
+              required={required}
+              value={value}
+              sx={{
+                display: "none",
+              }}
+            />
+            <TextField
+              size="small"
+              inputProps={{
+                accept: type === "image" ? "image/*" : "application/pdf",
+              }}
+              type={"file"}
+              onChange={onChange}
+            />
+            <div style={{ width: "200px", margin: "10px auto" }}>
+              {value &&
+                (type === "image" ? (
+                  <img width="100%" src={value} alt="resume" />
+                ) : (
+                  <a href={value} target="_blank" rel="noreferrer">
+                    view Resume
+                  </a>
+                ))}
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
 
 export default FileUpload
