@@ -2,18 +2,22 @@ import React from 'react'
 import { useContext } from 'react';
 import { userContext } from '../../context/userContext';
 import { useNavigate } from 'react-router-dom';
-import {auth} from '../../../components/FirebaseConfig'
+import {auth,db} from '../../../components/FirebaseConfig'
 import { Button,Grid, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Dropdown from '../../common/Dropdown';
+import FileUpload from '../../common/FileUpload';
 import './onBoarding.css'
-import { primaryRole } from '../../../constant';
+import { primaryRole , skills} from '../../../constant';
+import SearchDropdown from '../../common/SearchDropdown';
+import { doc, setDoc } from 'firebase/firestore';
+import { async } from '@firebase/util';
 
 function CandidateOnboarding() {
   const [state , dispatch] = useContext(userContext);
   const [userData, setUserData] = useState({
-    name: "",
-    email:"",
+    name: state.userInfo.displayName,
+    email: state.userInfo.email ,
     photo:"",
     uid:"",
     phoneNumber:"",
@@ -24,6 +28,7 @@ function CandidateOnboarding() {
     resume:""
   })
   const navigate = useNavigate(); 
+
   const logout = ()=>{
     auth.signOut()
     dispatch({
@@ -32,7 +37,36 @@ function CandidateOnboarding() {
     navigate('/candidate/auth')
   }
 
+  const handleSkills = (newval)=>{
+
+    console.log(newval)
+    if(userData.skills.includes(newval.value)) return;
+    else{
+    setUserData({...userData, skills:[...userData.skills,newval.value]})
+  }}
+  useEffect(()=>{
+    console.log(userData)
+  },[userData]);
+
+  const handleDelete = (item)=>{
+    setUserData({...userData, skills: userData.skills.filter((skill)=> skill !== item)})
+  }
+
+  const submit = async(e) => {
+    e.preventDefault()
+    console.log(userData);
+
+    // setDoc(docref, data)
+    //doc(db ref, collection name, doc id)
+    const userId = state.userInfo.uid;
+    await setDoc(doc(db,"userInfo", userId ),{
+      ...userData,
+    })
+  }
   return (
+    <form
+    onSubmit={(e)=> submit(e)}
+    >
       <Grid className='onboarding-container' container spacing={3}>
         <Grid item xs={12}>
           <Button onClick={logout} variant='contained' color='primary'>Logout</Button>
@@ -85,11 +119,12 @@ function CandidateOnboarding() {
         
         <Grid item xs={12} sm={6}>
           <div className='label'>Skills</div>
-          <TextField size='small' fullWidth
-          value={userData.skills}
-          required
-          onChange={(e)=> setUserData({...userData, skills: e.target.value})}
-        />
+          <SearchDropdown
+          dropdowndata={skills}
+          onChange={(newval)=> handleSkills(newval)}
+          values = {userData.skills}
+          handleDelete={handleDelete}
+          /> 
         </Grid>
 
         <Grid item xs={12} sm={6}>
@@ -103,20 +138,30 @@ function CandidateOnboarding() {
         
         <Grid item xs={12} sm={6}>
           <div className='label'>Resume</div>
-          <TextField size='small' fullWidth
-          type={"file"}
-          // value={userData.resume}
-          // required
-          // onChange={(e)=> setUserData({...userData, resume: e.target.value})}
-       />
+          <FileUpload
+          required = {true}
+          onUpload={(url)=> setUserData({...userData, resume: url})}
+          value={userData.resume}
+          type='file'
+          />
         </Grid>
 
         <Grid item xs={12}>
-          <Button variant='contained' color='primary'>
+          <Button 
+           disabled={
+            userData.name === "" ||
+            userData.email === "" ||
+            userData.phoneNumber === ""||
+            userData.primaryRole === ""||
+            userData.resume === ""||
+            userData.skills.length === 0
+           }
+          variant='contained' type='submit' color='primary'>
             Submit
           </Button>
         </Grid>
       </Grid>
+    </form>
   )
 }
 

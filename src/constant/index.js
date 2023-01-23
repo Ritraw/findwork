@@ -40,3 +40,38 @@ export const primaryRole=[
         value: "Buisness Analyst",
     }
 ]
+
+export const skills = [
+    {
+        label: "Java",
+        value: "Java"
+    },
+    {
+        label: "Python",
+        value: "Python"
+    },
+    {
+        label: "React",
+        value: "React"
+    },
+    {
+        label: "Angular",
+        value: "Angular"
+    },
+    { 
+        label: "JavaScript",
+        value: "JavaScript"
+    },
+    { 
+        label: "Vue",
+        value: "Vue"
+    },
+    { 
+        label: "Node",
+        value: "Node"
+    },
+    { 
+        label: "Express",
+        value: "Express"
+    },
+]

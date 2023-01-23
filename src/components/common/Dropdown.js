@@ -6,7 +6,10 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
 function Dropdown({ 
-    dropdowndata, onChange, value
+    dropdowndata,
+    onChange, 
+    value,
+    disabled
 
 }) {
   
