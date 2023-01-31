@@ -1,7 +1,7 @@
 import React from 'react'
 import { Skeleton } from '@mui/material'
 
-function Loadingprofile({fields}) {
+function Loadingprofile({fields,height}) {
   let list = [...Array(fields).keys()]
   return (
     <div style={{
@@ -12,10 +12,10 @@ function Loadingprofile({fields}) {
         list.map((item)=>{
           return (<Skeleton
             sx={{
-              margin: '10px 0',
+              margin: 'auto',
               maxWidth: '90%',
             }} 
-            height={50}
+            height={height||50}
             animation="wave"/>)
         })
       }

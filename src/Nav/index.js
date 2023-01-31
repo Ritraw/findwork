@@ -49,18 +49,17 @@ function Nav () {
             <Route path="/" element={<LandingPage/>}/>
             <Route path="/candidate/auth" element={<Auth type={'candidate'}/>}/>
             <Route path="/employer/auth" element={<Auth type={'employer'}/>}/>
-
+            <Route path="/candidate/onboarding" element={<CandidateOnboarding/>}/>
 
             <Route element={<CandidateProtectedRoutes/>}>
-              <Route path="/candidate/onboarding" element={<CandidateOnboarding/>}/>
               <Route path="/candidate/profile" element={<CandidateProfile/>}/>
               <Route path="/candidate/jobs" element={<CandidateJobs/>}/>
               <Route path="/candidate/applications" element={<CandidateApplications/>}/>
               <Route path="/candidate/conversations" element={<CandidateConversations/>}/>
             </Route>
 
+            <Route path="/employer/onboarding" element={<EmployerOnboarding/>}/>
             <Route element={<EmployerProtectedRoutes/>}>
-              <Route path="/employer/onboarding" element={<EmployerOnboarding/>}/>
               <Route path="/employer/profile" element={<EmployerProfile/>}/>
               <Route path="/employer/jobs" element={<EmployerJobs/>}/>
               <Route path="/employer/applications" element={<EmployerApplications/>}/>
