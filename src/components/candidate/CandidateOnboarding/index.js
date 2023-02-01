@@ -64,6 +64,7 @@ function CandidateOnboarding() {
       await setDoc(doc(db,"userInfo", userId ),{
         ...userData,
         userType: "candidate",
+        userId
       })
       toastMessage({message: 'Profile created Successfully', type: 'success'})
       navigate("/candidate/profile")

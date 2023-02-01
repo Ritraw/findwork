@@ -2,41 +2,42 @@ import { Divider } from "@mui/material";
 import React from "react";
 
 
-function EmployerJobCard(item) {
+function EmployerJobCard({item,selectedJob, setSelectedJob}) {
   const {
     jobTitle,
     createdAt,
     jobLocation,
     jobType,
     jobId,
-    selectedJob,
-    setSelectedJob
+   
     
   } = item;
 
   return (
+    
     <div>
       <div
-      onClick={() =>
-          setSelectedJob(item)}
-      className={`job-card ${jobId === selectedJob?.jobId ? "selected-card": ""}`}
+        onClick={() =>
+          setSelectedJob(item)
+        }
+        className={`job-card ${
+          jobId === selectedJob?.jobId ? "selected-card" : ""
+        } `}
       >
-
-      
-      <div className="job-last-edit">
-        Last Edited {new Date(createdAt.seconds * 1000).toLocaleDateString()}
-      </div>
-      <div className="job-card-details-item">
-        <div className="job-card-title">{jobTitle}</div>
-        <div className="job-card-location">{jobLocation}</div>
-        <div className="job-card-location">Job Type {jobType}</div>
-      </div>
-      <p>
+        <div className="job-last-edit">
+          Last Edited {new Date(createdAt.seconds * 1000).toLocaleDateString()}
+        </div>
+        <div className="job-card-details-item">
+          <div className="job-card-title">{jobTitle}</div>
+          <div className="job-card-location">{jobLocation}</div>
+          <div className="job-card-location">Job Type {jobType}</div>
+        </div>
+        <p>
           <Divider />
-      </p>
+        </p>
       </div>
     </div>
-  )
+  );
 }
 
 export default EmployerJobCard

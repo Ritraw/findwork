@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { Button, Grid, TextField } from "@mui/material";
 import Dropdown from '../../common/Dropdown';
 import SearchDropdown from '../../common/SearchDropdown';
@@ -7,10 +7,14 @@ import {addDoc,collection,doc,getDocs,query,setDoc,where} from 'firebase/firesto
 import {db} from '../../FirebaseConfig';
 import toastMessage from '../../../util/toastMessage';
 import { userContext } from '../../context/userContext';
-function JobForm({ selectedJob, setSelectedJob,setMobileFormView }) {
-  const[state,dispatch] = useContext(userContext);
-  const [isEdit, setIsEdit] = useState(selectedJob ? true : false);
-  const [jobData, setjobData] = useState({
+import { v4 as uuidv4 } from "uuid";
+
+
+function JobForm({ selectedJob, setSelectedJob,setMobileFormView })  {
+  const [isEdit, setIsEdit] = useState(selectedJob ? true: false);
+  const [state, dispatch] = useContext(userContext);
+  const [loading, setLoading] = useState(false);
+  const [jobData, setJobdata] = useState({
     jobTitle: "", 
     jobType: "", 
     jobLocation: "", 
@@ -24,122 +28,197 @@ function JobForm({ selectedJob, setSelectedJob,setMobileFormView }) {
     },
     skills: [],
   });
-  const handleSkills = (newval)=>{
 
-    console.log(newval)
-    if(jobData.skills.includes(newval.value)) return;
-    else{
-    setjobData({...jobData, skills:[...jobData.skills,newval.value]})
-  }}
-
-  const handleDelete = (item)=>{
-    setjobData({...jobData, skills: jobData.skills.filter((skill)=> skill !== item)})
-  }
-  
-  const submit= async(e)=>{
-    e.preventDefault()
-    console.log(jobData)
-    const q = query(collection(db,"userInfo"),where("userId","==",state.user.uid))
-    // store job in firebase
-    try{
-    await addDoc(collection(db,"jobs"),{
-      ...jobData,
-      createdAt: new Date(),
-      companyId: "",
-      companyName: "",
-      companyLogo: "",
-     });
-     toastMessage({
-      type:"success",
-      message: "Job added Successfully"
-     })
+  useEffect(() => {
+    if (selectedJob) {
+      setMobileFormView(true);
+      setJobdata(selectedJob);
+      setIsEdit(false);
+    } else {
+      setJobdata({
+        jobTitle: "", 
+        jobType: "", 
+        jobLocation: "", 
+        jobDescription: "", 
+        primaryRole: "", 
+        yearsOfExperience: "", 
+        salaryRange: {
+          min: "",
+          max: "",
+          currency: "",
+        },
+        skills: [],
+      });
+      setIsEdit(true);
     }
-    catch(err){
+  }, [selectedJob]);
+
+  const handleSkills = (newval) => {
+    console.log(newval);
+    if (jobData.skills.includes(newval.value)) return;
+    else {
+      setJobdata({ ...jobData, skills: [...jobData.skills, newval.value] });
+    }
+  };
+  const handleDelete = (item) => {
+    setJobdata({
+      ...jobData,
+      skills: jobData.skills.filter((skill) => skill !== item),
+    });
+  };
+  
+  const submit = async (e) => {
+    const jobId = selectedJob ? selectedJob.jobId : uuidv4();
+    e.preventDefault();
+    setLoading(true);
+    var employerData;
+    console.log(jobData);
+    
+    //get company imformation
+    try {
+      console.log(state.userInfo.uid);
+      const q = query(
+        collection(db, "userInfo"),
+        where("userId", "==", state.userInfo.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        employerData = doc.data();
+      });
+      console.log(employerData);
+    } catch (err) {
       console.log(err);
       toastMessage({
-        type:"error",
-        message:"Something went wrong"
-      })
+        type: "error",
+        message: "Something went wrong in fetching employer data",
+      });
     }
-  }
-  
- 
 
-
-
+    // add job to firebase store
+    try {
+      const data = {
+        ...jobData,
+        createdAt: new Date(),
+        companyId: state.userInfo.uid,
+        companyName: employerData.companyName,
+        companyLogo: employerData.companyLogo,
+        companyTagline: employerData.companyTagline,
+        industryType: employerData.industryType,
+      };
+      await setDoc(doc(db, "jobs", jobId), {
+        ...data,
+        jobId,
+      });
+      toastMessage({
+        type: "success",
+        message: selectedJob
+          ? "job updated successfully"
+          : "Job added successfully",
+      });
+      setLoading(false);
+      setSelectedJob(data);
+    } catch (err) {
+      console.log(err);
+      toastMessage({
+        type: "error",
+        message: "Something went wrong",
+      });
+    }
+  };
   return (
-    <form
-    onSubmit={(e)=> submit(e)}
-    >
-      <Grid className='onboarding-container' container spacing={3}>
-        <Grid item xs={12}>
-        <Button
-            variant="contained"
-            color="primary"
-            sx={{
-              marginRight: "10px",
-            }}
-            onClick={() => setIsEdit((p) => !p)}
-          >
-            {isEdit ? "cancel" : "Edit"}
-          </Button>
-          
+    <form onSubmit={(e) => submit(e)}>
+      <Grid className="onboarding-container" container spacing={3}>
+        <Grid
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+          item
+          xs={12}
+        >
+          {
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                marginRight: "10px",
+                display:{xs:'block',sm:'none'}
+              }}
+              onClick={() =>setMobileFormView(false) }
+            >
+              back
+            </Button>
+          }
+          {selectedJob && (
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                marginRight: "10px",
+              }}
+              onClick={() => setIsEdit((p) => !p)}
+            >
+              {isEdit ? "cancel" : "Edit"}
+            </Button>
+          )}
         </Grid>
-
         <Grid item xs={12} sm={6}>
-          <div className='label'>Job Title</div>
-          <TextField 
+          <div className="label">Job Title</div>
+          <TextField
             disabled={!isEdit}
-            size='small' fullWidth
+            size="small"
+            fullWidth
             value={jobData.jobTitle}
             required
-            onChange={(e)=> setjobData({...jobData, jobTitle: e.target.value})}
+            onChange={(e) =>
+              setJobdata({ ...jobData, jobTitle: e.target.value })
+            }
           />
         </Grid>
-        
         <Grid item xs={12} sm={6}>
-          <div className='label'>Job Type</div>
+          <div className="label">Job Type</div>
           <Dropdown
-          disabled={!isEdit}
+            disabled={!isEdit}
             dropdowndata={jobType}
-
-            onChange={(newval)=>setjobData({...jobData,jobType:newval})}
+            onChange={(newval) => setJobdata({ ...jobData, jobType: newval })}
             value={jobData.jobType}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <div className='label'>Job Location</div>
+          <div className="label">Job Location</div>
           <Dropdown
-          disabled={!isEdit}
+            disabled={!isEdit}
             dropdowndata={jobLocation}
-
-            onChange={(newval)=>setjobData({...jobData,jobLocation:newval})}
+            onChange={(newval) =>
+              setJobdata({ ...jobData, jobLocation: newval })
+            }
             value={jobData.jobLocation}
           />
         </Grid>
-        
         <Grid item xs={12} sm={6}>
-          <div className='label'>PrimaryRole</div>
+          <div className="label">primary Role</div>
           <Dropdown
-          disabled={!isEdit}
+            disabled={!isEdit}
             dropdowndata={primaryRole}
-
-            onChange={(newval)=>setjobData({...jobData,primaryRole:newval})}
+            onChange={(newval) =>
+              setJobdata({ ...jobData, primaryRole: newval })
+            }
             value={jobData.primaryRole}
           />
         </Grid>
-        
-        <Grid item xs={12} sm={6}>
-          <div className='label'>yearsOfExperience</div>
-          <Dropdown
-          disabled={!isEdit}
-            dropdowndata={experience}
 
-            onChange={(newval)=>setjobData({...jobData,yearsOfExperience:newval})}
+        <Grid item xs={12} sm={6}>
+          <div className="label">Years of Experience</div>
+          <Dropdown
+            disabled={!isEdit}
+            dropdowndata={experience}
+            onChange={(newval) =>
+              setJobdata({ ...jobData, yearsOfExperience: newval })
+            }
             value={jobData.yearsOfExperience}
           />
         </Grid>
-        
+
         <Grid item xs={12}>
           <div className="label">Salary Range</div>
           <Grid container spacing={2}>
@@ -148,7 +227,7 @@ function JobForm({ selectedJob, setSelectedJob,setMobileFormView }) {
                 disabled={!isEdit}
                 dropdowndata={currency}
                 onChange={(newval) =>
-                  setjobData({
+                  setJobdata({
                     ...jobData,
                     salaryRange: { ...jobData.salaryRange, currency: newval },
                   })
@@ -163,7 +242,7 @@ function JobForm({ selectedJob, setSelectedJob,setMobileFormView }) {
                 fullWidth
                 value={jobData.salaryRange.min}
                 onChange={(e) =>
-                  setjobData({
+                  setJobdata({
                     ...jobData,
                     salaryRange: {
                       ...jobData.salaryRange,
@@ -180,7 +259,7 @@ function JobForm({ selectedJob, setSelectedJob,setMobileFormView }) {
                 fullWidth
                 value={jobData.salaryRange.max}
                 onChange={(e) =>
-                  setjobData({
+                  setJobdata({
                     ...jobData,
                     salaryRange: {
                       ...jobData.salaryRange,
@@ -202,7 +281,7 @@ function JobForm({ selectedJob, setSelectedJob,setMobileFormView }) {
             fullWidth
             value={jobData.jobDescription}
             onChange={(e) =>
-              setjobData({
+              setJobdata({
                 ...jobData,
                 jobDescription: e.target.value,
               })
@@ -211,36 +290,40 @@ function JobForm({ selectedJob, setSelectedJob,setMobileFormView }) {
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <div className='label'>Skills</div>
+          <div className="label">skills</div>
           <SearchDropdown
-          disabled={!isEdit}
-          dropdowndata={skills}
-          onChange={(newval)=> handleSkills(newval)}
-          values = {jobData.skills}
-          handleDelete={handleDelete}
-          /> 
+            disabled={!isEdit}
+            dropdowndata={skills}
+            onChange={(newval) => handleSkills(newval)}
+            values={jobData.skills}
+            handleDelete={handleDelete}
+          />
         </Grid>
-
         <Grid item xs={12}>
           {isEdit && (
-          <Button
-          className='submit-btn' 
-           disabled={
-            jobData.name === "" ||
-            jobData.email === "" ||
-            jobData.phoneNumber === ""||
-            jobData.primaryRole === ""||
-            jobData.resume === ""||
-            jobData.skills.length === 0
-           }
-          variant='contained' type='submit' color='primary'>
-            Submit
-          </Button>
+            <Button
+              className="submit-btn"
+              disabled={
+                jobData.name === "" ||
+                jobData.email === "" ||
+                jobData.phoneNumber === "" ||
+                jobData.primaryRole === "" ||
+                jobData.resume === "" ||
+                jobData.skills.length === 0 ||
+                loading === true
+              }
+              variant="contained"
+              type="submit"
+              color="primary"
+            >
+              Submit
+            </Button>
           )}
         </Grid>
       </Grid>
     </form>
-  )
+  );
 }
+
 
 export default JobForm
