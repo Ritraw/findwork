@@ -21,8 +21,8 @@ const pages = [
     path: 'employer/jobs',
   },
   {
-    title: 'Applicants',
-    path: 'employer/applicants',
+    title: 'Applications',
+    path: 'employer/applications',
   },
   {
     title: 'Conversations',
