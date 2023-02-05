@@ -12,7 +12,7 @@ import CandidateConversations from '../components/candidate/CandidateConversatio
 import EmployerOnboarding from '../components/employer/EmployerOnboarding';
 import EmployerProfile from '../components/employer/EmployerProfile';
 import EmployerJobs from '../components/employer/EmployerJobs';
-import EmployerApplications from '../components/employer/EmployerApplications';
+import EmployerApplicants from '../components/employer/EmployerApplicants';
 import EmployerConversations from '../components/employer/EmployerConversations';
 import { userContext } from '../components/context/userContext';
 import EmployerHoc  from '../components/Hoc/EmployerHoc';
@@ -62,7 +62,7 @@ function Nav () {
             <Route element={<EmployerProtectedRoutes/>}>
               <Route path="/employer/profile" element={<EmployerProfile/>}/>
               <Route path="/employer/jobs" element={<EmployerJobs/>}/>
-              <Route path="/employer/applications" element={<EmployerApplications/>}/>
+              <Route path="/employer/applicants" element={<EmployerApplicants/>}/>
               <Route path="/employer/conversations" element={<EmployerConversations/>}/>
             </Route>
             

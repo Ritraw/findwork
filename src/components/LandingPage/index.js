@@ -10,7 +10,7 @@ function LandingPage() {
       <h2>One Platform Many Solutions</h2>
       <h2>Featured Job Circulars</h2>
       <h2>Upload CV Section</h2>
-      <h2>Footer</h2>
+      
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { TextField } from '@mui/material'
 import React, { useState } from 'react'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from '../../FirebaseConfig';
+import './fileupload.css'
 
 function FileUpload({
     type='file',
